@@ -1,0 +1,1126 @@
+basePath: /
+definitions:
+  models.AssignTicketRequest:
+    properties:
+      agent_id:
+        type: string
+    required:
+    - agent_id
+    type: object
+  models.Attachment:
+    properties:
+      created_at:
+        type: string
+      file_path:
+        type: string
+      file_size:
+        type: integer
+      filename:
+        type: string
+      id:
+        type: string
+      is_safe:
+        type: boolean
+      is_virus_scanned:
+        type: boolean
+      mime_type:
+        type: string
+      ticket:
+        allOf:
+        - $ref: '#/definitions/models.Ticket'
+        description: Relationships
+      ticket_id:
+        type: string
+      uploaded_by:
+        $ref: '#/definitions/models.User'
+      uploaded_by_id:
+        type: string
+    type: object
+  models.AuthResponse:
+    properties:
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.Category:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/models.Category'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      parent:
+        allOf:
+        - $ref: '#/definitions/models.Category'
+        description: Relationships
+      parent_id:
+        type: string
+      tickets:
+        items:
+          $ref: '#/definitions/models.Ticket'
+        type: array
+    type: object
+  models.Comment:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      is_internal:
+        type: boolean
+      ticket:
+        allOf:
+        - $ref: '#/definitions/models.Ticket'
+        description: Relationships
+      ticket_id:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      user_id:
+        type: string
+    type: object
+  models.CreateTicketRequest:
+    properties:
+      category_id:
+        type: string
+      description:
+        minLength: 1
+        type: string
+      due_date:
+        type: string
+      priority:
+        allOf:
+        - $ref: '#/definitions/models.TicketPriority'
+        enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - CRITICAL
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - description
+    - priority
+    - title
+    type: object
+  models.ErrorResponse:
+    description: Error response structure
+    properties:
+      message:
+        example: database unreachable
+        type: string
+      status:
+        example: error
+        type: string
+    type: object
+  models.EscalateTicketRequest:
+    properties:
+      escalated_to:
+        type: string
+      reason:
+        minLength: 1
+        type: string
+    required:
+    - escalated_to
+    - reason
+    type: object
+  models.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  models.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.PingResponse:
+    description: Response from ping endpoints
+    properties:
+      message:
+        example: pong
+        type: string
+      status:
+        example: ok
+        type: string
+    type: object
+  models.RegisterRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      last_name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      password:
+        minLength: 8
+        type: string
+      role:
+        $ref: '#/definitions/models.UserRole'
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - role
+    type: object
+  models.ResetPasswordRequest:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - token
+    type: object
+  models.SuccessResponse:
+    description: Success response structure
+    properties:
+      message:
+        example: Operation completed successfully
+        type: string
+      status:
+        example: success
+        type: string
+    type: object
+  models.Ticket:
+    properties:
+      assigned_agent:
+        $ref: '#/definitions/models.User'
+      assigned_agent_id:
+        type: string
+      attachments:
+        items:
+          $ref: '#/definitions/models.Attachment'
+        type: array
+      category:
+        allOf:
+        - $ref: '#/definitions/models.Category'
+        description: Relationships
+      category_id:
+        type: string
+      comments:
+        items:
+          $ref: '#/definitions/models.Comment'
+        type: array
+      created_by:
+        $ref: '#/definitions/models.User'
+      created_by_id:
+        type: string
+      creation_time:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      escalated_at:
+        type: string
+      escalated_to:
+        type: string
+      escalated_to_user:
+        $ref: '#/definitions/models.User'
+      expiration_time:
+        type: string
+      id:
+        description: Time-series fields
+        type: string
+      priority:
+        $ref: '#/definitions/models.TicketPriority'
+      resolved_at:
+        type: string
+      status:
+        $ref: '#/definitions/models.TicketStatus'
+      title:
+        description: Business fields
+        type: string
+    type: object
+  models.TicketListResponse:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      tickets:
+        items:
+          $ref: '#/definitions/models.Ticket'
+        type: array
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  models.TicketPriority:
+    enum:
+    - LOW
+    - MEDIUM
+    - HIGH
+    - CRITICAL
+    type: string
+    x-enum-varnames:
+    - PriorityLow
+    - PriorityMedium
+    - PriorityHigh
+    - PriorityCritical
+  models.TicketStats:
+    properties:
+      closed_tickets:
+        type: integer
+      escalated_tickets:
+        type: integer
+      in_progress_tickets:
+        type: integer
+      open_tickets:
+        type: integer
+      overdue_tickets:
+        type: integer
+      resolved_tickets:
+        type: integer
+      total_tickets:
+        type: integer
+    type: object
+  models.TicketStatus:
+    enum:
+    - OPEN
+    - IN_PROGRESS
+    - RESOLVED
+    - CLOSED
+    type: string
+    x-enum-varnames:
+    - StatusOpen
+    - StatusInProgress
+    - StatusResolved
+    - StatusClosed
+  models.UpdateTicketRequest:
+    properties:
+      category_id:
+        type: string
+      description:
+        minLength: 1
+        type: string
+      due_date:
+        type: string
+      priority:
+        allOf:
+        - $ref: '#/definitions/models.TicketPriority'
+        enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - CRITICAL
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    type: object
+  models.UpdateTicketStatusRequest:
+    properties:
+      status:
+        allOf:
+        - $ref: '#/definitions/models.TicketStatus'
+        enum:
+        - OPEN
+        - IN_PROGRESS
+        - RESOLVED
+        - CLOSED
+    required:
+    - status
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      is_verified:
+        type: boolean
+      last_login_at:
+        type: string
+      last_name:
+        type: string
+      role:
+        $ref: '#/definitions/models.UserRole'
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  models.UserRole:
+    enum:
+    - END_USER
+    - SUPPORT_AGENT
+    - ADMINISTRATOR
+    - MANAGER
+    type: string
+    x-enum-varnames:
+    - RoleEndUser
+    - RoleSupportAgent
+    - RoleAdministrator
+    - RoleManager
+  models.VerifyEmailRequest:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: A RESTful API for the HelpChat application
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: HelpChat API
+  version: "1.0"
+paths:
+  /api/v1/auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Send password reset email to user
+      parameters:
+      - description: Forgot password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset email sent
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Request password reset
+      tags:
+      - authentication
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT tokens as cookies
+      parameters:
+      - description: Login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/models.AuthResponse'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login user
+      tags:
+      - authentication
+  /api/v1/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user and clear authentication cookies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logout successful
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout user
+      tags:
+      - authentication
+  /api/v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Generate new access token using refresh token from cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token refreshed successfully
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Invalid refresh token
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Refresh access token
+      tags:
+      - authentication
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account with the specified role
+      parameters:
+      - description: Registration request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/models.AuthResponse'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - authentication
+  /api/v1/auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset password using reset token
+      parameters:
+      - description: Reset password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset successful
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Invalid or expired token
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Reset password
+      tags:
+      - authentication
+  /api/v1/auth/verify-email:
+    post:
+      consumes:
+      - application/json
+      description: Verify user email address using verification token
+      parameters:
+      - description: Email verification request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.VerifyEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Email verified successfully
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Invalid or expired token
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Verify email address
+      tags:
+      - authentication
+  /api/v1/tickets:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of tickets with filtering and pagination
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 20, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by priority
+        in: query
+        name: priority
+        type: string
+      - description: Filter by category ID
+        in: query
+        name: category_id
+        type: string
+      - description: Filter by assigned agent ID
+        in: query
+        name: assigned_to
+        type: string
+      - description: Filter by creator ID
+        in: query
+        name: created_by
+        type: string
+      - description: Search in title and description
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TicketListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List tickets
+      tags:
+      - tickets
+    post:
+      consumes:
+      - application/json
+      description: Create a new support ticket
+      parameters:
+      - description: Ticket data
+        in: body
+        name: ticket
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTicketRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Ticket'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new ticket
+      tags:
+      - tickets
+  /api/v1/tickets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ticket (admin only)
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a ticket
+      tags:
+      - tickets
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a ticket by its ID
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Ticket'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get a ticket by ID
+      tags:
+      - tickets
+    put:
+      consumes:
+      - application/json
+      description: Update an existing ticket
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated ticket data
+        in: body
+        name: ticket
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateTicketRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Ticket'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a ticket
+      tags:
+      - tickets
+  /api/v1/tickets/{id}/assign:
+    post:
+      consumes:
+      - application/json
+      description: Assign a ticket to a support agent
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Assignment data
+        in: body
+        name: assignment
+        required: true
+        schema:
+          $ref: '#/definitions/models.AssignTicketRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Assign a ticket to an agent
+      tags:
+      - tickets
+  /api/v1/tickets/{id}/escalate:
+    post:
+      consumes:
+      - application/json
+      description: Escalate a ticket to a manager or administrator
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Escalation data
+        in: body
+        name: escalation
+        required: true
+        schema:
+          $ref: '#/definitions/models.EscalateTicketRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Escalate a ticket
+      tags:
+      - tickets
+  /api/v1/tickets/{id}/status:
+    post:
+      consumes:
+      - application/json
+      description: Update the status of a ticket
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Status update data
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateTicketStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update ticket status
+      tags:
+      - tickets
+  /api/v1/tickets/assigned:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve tickets assigned to the current user
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 20, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TicketListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get assigned tickets
+      tags:
+      - tickets
+  /api/v1/tickets/my:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve tickets created by the current user
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 20, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TicketListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get my tickets
+      tags:
+      - tickets
+  /api/v1/tickets/stats:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve ticket statistics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TicketStats'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get ticket statistics
+      tags:
+      - tickets
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: Simple health check to verify the API is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PingResponse'
+      summary: Health check endpoint
+      tags:
+      - health
+  /ping-through:
+    get:
+      consumes:
+      - application/json
+      description: Health check that verifies both the API and database are running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PingResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Database health check endpoint
+      tags:
+      - health
+securityDefinitions:
+  ApiKeyAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
