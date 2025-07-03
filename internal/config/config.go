@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strings"
 )
 
 // Config holds all configuration for the application
@@ -9,6 +10,7 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	JWT      JWTConfig
+	CORS     CORSConfig
 }
 
 // ServerConfig holds server-related configuration
@@ -34,6 +36,14 @@ type JWTConfig struct {
 	CookieSameSite string
 }
 
+// CORSConfig holds CORS-related configuration
+type CORSConfig struct {
+	AllowedOrigins   []string
+	AllowedMethods   []string
+	AllowedHeaders   []string
+	AllowCredentials bool
+}
+
 // Load loads configuration from environment variables
 func Load() *Config {
 	return &Config{
@@ -53,6 +63,12 @@ func Load() *Config {
 			CookieSecure:    getEnv("JWT_COOKIE_SECURE", "false") == "true",
 			CookieSameSite:  getEnv("JWT_COOKIE_SAME_SITE", "Lax"),
 		},
+		CORS: CORSConfig{
+			AllowedOrigins:   getCORSOrigins(),
+			AllowedMethods:   []string{"GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"Origin", "Content-Type", "Accept", "Authorization", "content-type"},
+			AllowCredentials: true,
+		},
 	}
 }
 
@@ -62,4 +78,29 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+// getCORSOrigins gets CORS origins from environment variable or returns default values
+func getCORSOrigins() []string {
+	if origins := os.Getenv("CORS_ALLOWED_ORIGINS"); origins != "" {
+		// Split by comma and trim whitespace
+		originList := strings.Split(origins, ",")
+		for i, origin := range originList {
+			originList[i] = strings.TrimSpace(origin)
+		}
+		return originList
+	}
+
+	// Default origins for development
+	return []string{
+		"http://localhost:3000",
+		"http://localhost:3001",
+		"http://localhost:5173",
+		"http://localhost:8081",
+		"http://localhost:8082",
+		"http://localhost:4173", // Vite preview
+		"http://localhost:4000", // Common dev port
+		"http://localhost:4200", // Angular default
+		"http://localhost:4300", // Additional Angular port
+	}
 }

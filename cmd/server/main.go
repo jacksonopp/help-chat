@@ -78,7 +78,7 @@ func main() {
 	e.HidePort = true
 
 	// Setup middleware
-	setupMiddleware(e)
+	setupMiddleware(e, cfg)
 
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
@@ -128,7 +128,30 @@ func main() {
 	log.Println("Server exited")
 }
 
-func setupMiddleware(e *echo.Echo) {
+func setupMiddleware(e *echo.Echo, cfg *config.Config) {
+	// Convert config to Echo CORS format
+	allowMethods := make([]string, len(cfg.CORS.AllowedMethods))
+	for i, method := range cfg.CORS.AllowedMethods {
+		allowMethods[i] = method
+	}
+
+	allowHeaders := make([]string, len(cfg.CORS.AllowedHeaders))
+	for i, header := range cfg.CORS.AllowedHeaders {
+		allowHeaders[i] = header
+	}
+
+	corsConfig := middleware.CORSConfig{
+		AllowOrigins:     cfg.CORS.AllowedOrigins,
+		AllowMethods:     allowMethods,
+		AllowHeaders:     allowHeaders,
+		AllowCredentials: cfg.CORS.AllowCredentials,
+		ExposeHeaders:    []string{"Content-Length"},
+		MaxAge:           86400, // 24 hours
+	}
+
+	// CORS middleware (must be first to handle preflight requests)
+	e.Use(middleware.CORSWithConfig(corsConfig))
+
 	// Request logging middleware
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}, latency=${latency}, latency_human=${latency_human}\n",

@@ -13,6 +13,41 @@ A simple Go HTTP server with endpoints to ping the server and database.
 - **Connection Pooling**: Optimized database connection management
 - **Timeout Handling**: Context-based timeouts for database operations
 
+## CORS Configuration
+
+The API includes CORS (Cross-Origin Resource Sharing) support to allow requests from web applications running on different ports or domains.
+
+### Default Configuration
+
+By default, the API allows requests from common development ports:
+- `http://localhost:3000` (React default)
+- `http://localhost:3001` (React alternative)
+- `http://localhost:5173` (Vite default)
+- `http://localhost:8081` (Common dev port)
+- `http://localhost:8082` (Common dev port)
+- `http://localhost:4173` (Vite preview)
+- `http://localhost:4000` (Common dev port)
+- `http://localhost:4200` (Angular default)
+
+### Custom CORS Configuration
+
+You can customize CORS settings using environment variables:
+
+```bash
+# Set allowed origins (comma-separated)
+export CORS_ALLOWED_ORIGINS="http://localhost:3000,http://localhost:5173,https://myapp.com"
+
+# The API will allow all standard HTTP methods and common headers by default
+```
+
+### CORS Headers
+
+The API automatically sets the following CORS headers:
+- `Access-Control-Allow-Origin`: Set to the requesting origin (if allowed)
+- `Access-Control-Allow-Methods`: GET, HEAD, PUT, PATCH, POST, DELETE
+- `Access-Control-Allow-Headers`: Origin, Content-Type, Accept, Authorization
+- `Access-Control-Allow-Credentials`: true (for cookie-based authentication)
+
 ## Prerequisites
 
 - Go 1.24.4 or later
@@ -37,6 +72,7 @@ The server uses environment variables for configuration. You can set these in yo
 | `PORT`    | `8080`        | Port for the server to listen on |
 | `HOST`    | `0.0.0.0`     | Host for the server to bind to   |
 | `DB_FILE` | `helpchat.db` | SQLite database file path        |
+| `CORS_ALLOWED_ORIGINS` | See CORS section | Comma-separated list of allowed origins |
 
 ### Example `.env` file
 
