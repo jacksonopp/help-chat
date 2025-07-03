@@ -67,34 +67,22 @@ func (h *TicketHandler) RegisterRoutes(e *echo.Echo, ami *authMiddleware.AuthMid
 func (h *TicketHandler) CreateTicket(c echo.Context) error {
 	var req models.CreateTicketRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid request body",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid request body"))
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponseFromError(err))
 	}
 
 	// Get user ID from context
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Status:  "error",
-			Message: "Unauthorized",
-		})
+		return c.JSON(http.StatusUnauthorized, models.NewErrorResponse("Unauthorized"))
 	}
 
 	ticket, err := h.ticketService.CreateTicket(c.Request().Context(), &req, userID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.JSON(http.StatusCreated, ticket)
@@ -117,25 +105,16 @@ func (h *TicketHandler) CreateTicket(c echo.Context) error {
 func (h *TicketHandler) GetTicket(c echo.Context) error {
 	ticketID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid ticket ID",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid ticket ID"))
 	}
 
 	ticket, err := h.ticketService.GetTicket(c.Request().Context(), ticketID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	if ticket == nil {
-		return c.JSON(http.StatusNotFound, models.ErrorResponse{
-			Status:  "error",
-			Message: "Ticket not found",
-		})
+		return c.JSON(http.StatusNotFound, models.NewErrorResponse("Ticket not found"))
 	}
 
 	return c.JSON(http.StatusOK, ticket)
@@ -159,42 +138,27 @@ func (h *TicketHandler) GetTicket(c echo.Context) error {
 func (h *TicketHandler) UpdateTicket(c echo.Context) error {
 	ticketID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid ticket ID",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid ticket ID"))
 	}
 
 	var req models.UpdateTicketRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid request body",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid request body"))
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponseFromError(err))
 	}
 
 	// Get user ID from context
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Status:  "error",
-			Message: "Unauthorized",
-		})
+		return c.JSON(http.StatusUnauthorized, models.NewErrorResponse("Unauthorized"))
 	}
 
 	ticket, err := h.ticketService.UpdateTicket(c.Request().Context(), ticketID, &req, userID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.JSON(http.StatusOK, ticket)
@@ -218,27 +182,18 @@ func (h *TicketHandler) UpdateTicket(c echo.Context) error {
 func (h *TicketHandler) DeleteTicket(c echo.Context) error {
 	ticketID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid ticket ID",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid ticket ID"))
 	}
 
 	// Get user ID from context for authorization
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Status:  "error",
-			Message: "Unauthorized",
-		})
+		return c.JSON(http.StatusUnauthorized, models.NewErrorResponse("Unauthorized"))
 	}
 
 	err = h.ticketService.DeleteTicket(c.Request().Context(), ticketID, userID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -332,10 +287,7 @@ func (h *TicketHandler) ListTickets(c echo.Context) error {
 
 	tickets, err := h.ticketService.ListTickets(c.Request().Context(), query)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.JSON(http.StatusOK, tickets)
@@ -359,42 +311,27 @@ func (h *TicketHandler) ListTickets(c echo.Context) error {
 func (h *TicketHandler) AssignTicket(c echo.Context) error {
 	ticketID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid ticket ID",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid ticket ID"))
 	}
 
 	var req models.AssignTicketRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid request body",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid request body"))
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponseFromError(err))
 	}
 
 	// Get user ID from context
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Status:  "error",
-			Message: "Unauthorized",
-		})
+		return c.JSON(http.StatusUnauthorized, models.NewErrorResponse("Unauthorized"))
 	}
 
 	err = h.ticketService.AssignTicket(c.Request().Context(), ticketID, req.AgentID, userID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.JSON(http.StatusOK, models.SuccessResponse{
@@ -421,42 +358,27 @@ func (h *TicketHandler) AssignTicket(c echo.Context) error {
 func (h *TicketHandler) UpdateTicketStatus(c echo.Context) error {
 	ticketID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid ticket ID",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid ticket ID"))
 	}
 
 	var req models.UpdateTicketStatusRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid request body",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid request body"))
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponseFromError(err))
 	}
 
 	// Get user ID from context
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Status:  "error",
-			Message: "Unauthorized",
-		})
+		return c.JSON(http.StatusUnauthorized, models.NewErrorResponse("Unauthorized"))
 	}
 
 	err = h.ticketService.UpdateTicketStatus(c.Request().Context(), ticketID, &req, userID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.JSON(http.StatusOK, models.SuccessResponse{
@@ -483,42 +405,27 @@ func (h *TicketHandler) UpdateTicketStatus(c echo.Context) error {
 func (h *TicketHandler) EscalateTicket(c echo.Context) error {
 	ticketID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid ticket ID",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid ticket ID"))
 	}
 
 	var req models.EscalateTicketRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid request body",
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Invalid request body"))
 	}
 
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponseFromError(err))
 	}
 
 	// Get user ID from context
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Status:  "error",
-			Message: "Unauthorized",
-		})
+		return c.JSON(http.StatusUnauthorized, models.NewErrorResponse("Unauthorized"))
 	}
 
 	err = h.ticketService.EscalateTicket(c.Request().Context(), ticketID, &req, userID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.JSON(http.StatusOK, models.SuccessResponse{
@@ -544,19 +451,13 @@ func (h *TicketHandler) EscalateTicket(c echo.Context) error {
 func (h *TicketHandler) GetMyTickets(c echo.Context) error {
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Status:  "error",
-			Message: "Unauthorized",
-		})
+		return c.JSON(http.StatusUnauthorized, models.NewErrorResponse("Unauthorized"))
 	}
 
 	query := buildTicketQueryFromRequest(c)
 	tickets, err := h.ticketService.GetTicketsByUser(c.Request().Context(), userID, query)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.JSON(http.StatusOK, tickets)
@@ -579,19 +480,13 @@ func (h *TicketHandler) GetMyTickets(c echo.Context) error {
 func (h *TicketHandler) GetAssignedTickets(c echo.Context) error {
 	userID, err := getUserIDFromContext(c)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Status:  "error",
-			Message: "Unauthorized",
-		})
+		return c.JSON(http.StatusUnauthorized, models.NewErrorResponse("Unauthorized"))
 	}
 
 	query := buildTicketQueryFromRequest(c)
 	tickets, err := h.ticketService.GetTicketsByAgent(c.Request().Context(), userID, query)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.JSON(http.StatusOK, tickets)
@@ -611,10 +506,7 @@ func (h *TicketHandler) GetAssignedTickets(c echo.Context) error {
 func (h *TicketHandler) GetTicketStats(c echo.Context) error {
 	stats, err := h.ticketService.GetTicketStats(c.Request().Context())
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Status:  "error",
-			Message: err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponseFromError(err))
 	}
 
 	return c.JSON(http.StatusOK, stats)

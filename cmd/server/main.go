@@ -142,6 +142,9 @@ func setupMiddleware(e *echo.Echo) {
 
 	// Validation middleware
 	e.Use(authMiddleware.ValidationMiddleware())
+
+	// Error handling middleware (must be last to catch all errors)
+	e.Use(authMiddleware.ErrorHandlerMiddleware())
 }
 
 func setupRoutes(e *echo.Echo, pingHandler *handlers.PingHandler, authHandler *handlers.AuthHandler, ticketHandler *handlers.TicketHandler, authMiddlewareInstance *authMiddleware.AuthMiddleware) {

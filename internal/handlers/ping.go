@@ -52,10 +52,7 @@ func (h *PingHandler) Ping(c echo.Context) error {
 // @Router /ping-through [get]
 func (h *PingHandler) PingThrough(c echo.Context) error {
 	if err := h.db.Ping(); err != nil {
-		response := models.ErrorResponse{
-			Status:  "error",
-			Message: "database unreachable",
-		}
+		response := models.NewErrorResponse("database unreachable")
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 

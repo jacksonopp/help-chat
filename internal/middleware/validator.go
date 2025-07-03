@@ -58,9 +58,10 @@ type ValidationError struct {
 
 // ValidationErrorResponse represents a validation error response
 type ValidationErrorResponse struct {
-	Status  string            `json:"status"`
-	Message string            `json:"message"`
-	Errors  []ValidationError `json:"errors"`
+	Status   string            `json:"status"`
+	Message  string            `json:"message"`
+	Messages []string          `json:"messages"`
+	Errors   []ValidationError `json:"errors"`
 }
 
 // ValidationMiddleware creates middleware that handles validation errors
@@ -79,6 +80,7 @@ func ValidationMiddleware() echo.MiddlewareFunc {
 // HandleValidationError handles validation errors and returns a proper response
 func HandleValidationError(err error) *ValidationErrorResponse {
 	var errors []ValidationError
+	var messages []string
 
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {
 		for _, e := range validationErrors {
@@ -87,6 +89,7 @@ func HandleValidationError(err error) *ValidationErrorResponse {
 			value := e.Value()
 
 			message := getValidationMessage(field, tag, value)
+			messages = append(messages, message)
 
 			errors = append(errors, ValidationError{
 				Field:   field,
@@ -98,9 +101,10 @@ func HandleValidationError(err error) *ValidationErrorResponse {
 	}
 
 	return &ValidationErrorResponse{
-		Status:  "error",
-		Message: "Validation failed",
-		Errors:  errors,
+		Status:   "error",
+		Message:  "Validation failed",
+		Messages: messages,
+		Errors:   errors,
 	}
 }
 

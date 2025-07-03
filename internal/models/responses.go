@@ -12,8 +12,9 @@ type PingResponse struct {
 // ErrorResponse represents an error response
 // @Description Error response structure
 type ErrorResponse struct {
-	Status  string `json:"status" example:"error"`
-	Message string `json:"message" example:"database unreachable"`
+	Status   string   `json:"status" example:"error"`
+	Message  string   `json:"message" example:"database unreachable"`
+	Messages []string `json:"messages" example:"[\"Invalid email format\", \"Password too short\"]"`
 }
 
 // HealthResponse represents a comprehensive health check response
@@ -30,4 +31,27 @@ type HealthResponse struct {
 type SuccessResponse struct {
 	Status  string `json:"status" example:"success"`
 	Message string `json:"message" example:"Operation completed successfully"`
+}
+
+// NewErrorResponse creates a new error response with a single message
+func NewErrorResponse(message string) ErrorResponse {
+	return ErrorResponse{
+		Status:   "error",
+		Message:  message,
+		Messages: []string{message},
+	}
+}
+
+// NewErrorResponseWithMessages creates a new error response with multiple messages
+func NewErrorResponseWithMessages(message string, messages []string) ErrorResponse {
+	return ErrorResponse{
+		Status:   "error",
+		Message:  message,
+		Messages: messages,
+	}
+}
+
+// NewErrorResponseFromError creates a new error response from an error
+func NewErrorResponseFromError(err error) ErrorResponse {
+	return NewErrorResponse(err.Error())
 }

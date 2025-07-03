@@ -212,3 +212,52 @@ The server provides informative logs about:
 - Graceful shutdown with timeout handling
 - Context-based timeouts for database operations
 - Comprehensive health checking for all services
+
+## Error Response Format
+
+All error responses now follow a standardized format that includes a `messages` field containing an array of error messages. This allows clients to display multiple validation errors or detailed error information.
+
+### Error Response Structure
+
+```json
+{
+  "status": "error",
+  "message": "Request failed",
+  "messages": [
+    "Invalid email format",
+    "Password must be at least 8 characters",
+    "Username is required"
+  ]
+}
+```
+
+### Error Response Fields
+
+- `status`: Always "error" for error responses
+- `message`: A summary message describing the error
+- `messages`: An array of strings containing detailed error messages
+
+### Client Usage
+
+Clients can access error messages through the `error.error.messages` field:
+
+```javascript
+// Example client-side error handling
+try {
+  const response = await fetch('/api/v1/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData)
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    // Display all error messages
+    errorData.messages.forEach(message => {
+      console.error(message);
+    });
+  }
+} catch (error) {
+  console.error('Request failed:', error);
+}
+```
