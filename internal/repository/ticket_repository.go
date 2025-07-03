@@ -104,7 +104,7 @@ func (r *ticketRepository) List(ctx context.Context, query *models.TicketQuery) 
 		orderClause := fmt.Sprintf("%s %s", query.Sort.Field, strings.ToUpper(query.Sort.Direction))
 		db = db.Order(orderClause)
 	} else {
-		db = db.Order("created_at DESC")
+		db = db.Order("creation_time DESC")
 	}
 
 	// Apply pagination
@@ -276,11 +276,11 @@ func (r *ticketRepository) applyFilters(db *gorm.DB, filter *models.TicketFilter
 	}
 
 	if filter.DateFrom != nil {
-		db = db.Where("created_at >= ?", *filter.DateFrom)
+		db = db.Where("creation_time >= ?", *filter.DateFrom)
 	}
 
 	if filter.DateTo != nil {
-		db = db.Where("created_at <= ?", *filter.DateTo)
+		db = db.Where("creation_time <= ?", *filter.DateTo)
 	}
 
 	if filter.Search != "" {

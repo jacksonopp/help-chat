@@ -67,7 +67,7 @@ type TicketFilter struct {
 
 // TicketSort represents sorting options for ticket queries
 type TicketSort struct {
-	Field     string `json:"field" validate:"required,oneof=created_at updated_at priority status title"`
+	Field     string `json:"field" validate:"required,oneof=creation_time priority status title"`
 	Direction string `json:"direction" validate:"required,oneof=asc desc"`
 }
 

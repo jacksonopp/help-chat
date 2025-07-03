@@ -32,15 +32,30 @@ func NewDatabase(cfg *config.Config) (*Database, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	// Configure connection pool
+	// Configure connection pool with more conservative settings
 	sqlDB, err := gormDB.DB()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get underlying sql.DB: %w", err)
 	}
 
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
+	// Use more conservative connection pool settings for SQLite
+	sqlDB.SetMaxIdleConns(1)
+	sqlDB.SetMaxOpenConns(1)
 	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	// Configure SQLite pragmas for better performance and memory management
+	if _, err := sqlDB.Exec("PRAGMA journal_mode=WAL"); err != nil {
+		return nil, fmt.Errorf("failed to set journal mode: %w", err)
+	}
+	if _, err := sqlDB.Exec("PRAGMA synchronous=NORMAL"); err != nil {
+		return nil, fmt.Errorf("failed to set synchronous mode: %w", err)
+	}
+	if _, err := sqlDB.Exec("PRAGMA cache_size=1000"); err != nil {
+		return nil, fmt.Errorf("failed to set cache size: %w", err)
+	}
+	if _, err := sqlDB.Exec("PRAGMA temp_store=MEMORY"); err != nil {
+		return nil, fmt.Errorf("failed to set temp store: %w", err)
+	}
 
 	// Test connection
 	if err := sqlDB.Ping(); err != nil {

@@ -115,8 +115,7 @@ func CreateIndexes(db *Database) error {
 		"CREATE INDEX IF NOT EXISTS idx_tickets_category_id ON tickets(category_id)",
 		"CREATE INDEX IF NOT EXISTS idx_tickets_assigned_agent_id ON tickets(assigned_agent_id)",
 		"CREATE INDEX IF NOT EXISTS idx_tickets_created_by_id ON tickets(created_by_id)",
-		"CREATE INDEX IF NOT EXISTS idx_tickets_created_at ON tickets(created_at)",
-		"CREATE INDEX IF NOT EXISTS idx_tickets_updated_at ON tickets(updated_at)",
+		"CREATE INDEX IF NOT EXISTS idx_tickets_creation_time ON tickets(creation_time)",
 		"CREATE INDEX IF NOT EXISTS idx_tickets_escalated_at ON tickets(escalated_at)",
 		// Category indexes
 		"CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON categories(parent_id)",
