@@ -32,7 +32,7 @@ func ErrorHandlerMiddleware() echo.MiddlewareFunc {
 				}
 
 				// Create standardized error response
-				errorResponse := models.NewErrorResponseWithMessages("Request failed", messages)
+				errorResponse := models.NewErrorResponseWithMessages(messages)
 
 				// Return the error response with the appropriate status code
 				return c.JSON(httpError.Code, errorResponse)

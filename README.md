@@ -258,7 +258,6 @@ All error responses now follow a standardized format that includes a `messages` 
 ```json
 {
   "status": "error",
-  "message": "Request failed",
   "messages": [
     "Invalid email format",
     "Password must be at least 8 characters",
@@ -270,12 +269,11 @@ All error responses now follow a standardized format that includes a `messages` 
 ### Error Response Fields
 
 - `status`: Always "error" for error responses
-- `message`: A summary message describing the error
 - `messages`: An array of strings containing detailed error messages
 
 ### Client Usage
 
-Clients can access error messages through the `error.error.messages` field:
+Clients can access error messages through the `error.messages` field:
 
 ```javascript
 // Example client-side error handling

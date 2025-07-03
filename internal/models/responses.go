@@ -13,7 +13,6 @@ type PingResponse struct {
 // @Description Error response structure
 type ErrorResponse struct {
 	Status   string   `json:"status" example:"error"`
-	Message  string   `json:"message" example:"database unreachable"`
 	Messages []string `json:"messages" example:"[\"Invalid email format\", \"Password too short\"]"`
 }
 
@@ -37,16 +36,14 @@ type SuccessResponse struct {
 func NewErrorResponse(message string) ErrorResponse {
 	return ErrorResponse{
 		Status:   "error",
-		Message:  message,
 		Messages: []string{message},
 	}
 }
 
 // NewErrorResponseWithMessages creates a new error response with multiple messages
-func NewErrorResponseWithMessages(message string, messages []string) ErrorResponse {
+func NewErrorResponseWithMessages(messages []string) ErrorResponse {
 	return ErrorResponse{
 		Status:   "error",
-		Message:  message,
 		Messages: messages,
 	}
 }

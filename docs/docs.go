@@ -1306,9 +1306,15 @@ const docTemplate = `{
             "description": "Error response structure",
             "type": "object",
             "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "database unreachable"
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[\"Invalid email format\"",
+                        " \"Password too short\"]"
+                    ]
                 },
                 "status": {
                     "type": "string",

@@ -59,7 +59,6 @@ type ValidationError struct {
 // ValidationErrorResponse represents a validation error response
 type ValidationErrorResponse struct {
 	Status   string            `json:"status"`
-	Message  string            `json:"message"`
 	Messages []string          `json:"messages"`
 	Errors   []ValidationError `json:"errors"`
 }
@@ -102,7 +101,6 @@ func HandleValidationError(err error) *ValidationErrorResponse {
 
 	return &ValidationErrorResponse{
 		Status:   "error",
-		Message:  "Validation failed",
 		Messages: messages,
 		Errors:   errors,
 	}

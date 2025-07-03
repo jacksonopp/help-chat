@@ -14,16 +14,14 @@ func TestErrorResponseFormat(t *testing.T) {
 
 	// Verify the structure
 	assert.Equal(t, "error", errorResp.Status)
-	assert.Equal(t, "Test error message", errorResp.Message)
 	assert.Len(t, errorResp.Messages, 1)
 	assert.Equal(t, "Test error message", errorResp.Messages[0])
 
 	// Test with multiple messages
 	messages := []string{"Error 1", "Error 2", "Error 3"}
-	errorRespMulti := models.NewErrorResponseWithMessages("Multiple errors occurred", messages)
+	errorRespMulti := models.NewErrorResponseWithMessages(messages)
 
 	assert.Equal(t, "error", errorRespMulti.Status)
-	assert.Equal(t, "Multiple errors occurred", errorRespMulti.Message)
 	assert.Len(t, errorRespMulti.Messages, 3)
 	assert.Equal(t, messages, errorRespMulti.Messages)
 
@@ -36,7 +34,6 @@ func TestErrorResponseFormat(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, errorResp.Status, unmarshaled.Status)
-	assert.Equal(t, errorResp.Message, unmarshaled.Message)
 	assert.Equal(t, errorResp.Messages, unmarshaled.Messages)
 }
 
@@ -46,7 +43,6 @@ func TestErrorResponseFromError(t *testing.T) {
 	errorResp := models.NewErrorResponseFromError(testError)
 
 	assert.Equal(t, "error", errorResp.Status)
-	assert.Equal(t, testError.Error(), errorResp.Message)
 	assert.Len(t, errorResp.Messages, 1)
 	assert.Equal(t, testError.Error(), errorResp.Messages[0])
 }

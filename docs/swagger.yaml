@@ -120,9 +120,13 @@ definitions:
   models.ErrorResponse:
     description: Error response structure
     properties:
-      message:
-        example: database unreachable
-        type: string
+      messages:
+        example:
+        - '["Invalid email format"'
+        - ' "Password too short"]'
+        items:
+          type: string
+        type: array
       status:
         example: error
         type: string
