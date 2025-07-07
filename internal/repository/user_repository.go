@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"dev.azure.com/clearpointhealth/ClearQuoteV3/_git/helpchat/internal/models"
 	"dev.azure.com/clearpointhealth/ClearQuoteV3/_git/helpchat/pkg/database"
 
@@ -48,10 +50,17 @@ func (r *userRepository) GetByID(id string) (*models.User, error) {
 // GetByEmail retrieves a user by email
 func (r *userRepository) GetByEmail(email string) (*models.User, error) {
 	var user models.User
+	users, tempErr := r.List(5, 0)
+	fmt.Println(users, tempErr)
+	if len(users) > 0 {
+		for _, u := range users {
+			fmt.Println(u)
+		}
+	}
 	err := r.db.DB.Where("email = ?", email).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, nil
+			return nil, err
 		}
 		return nil, err
 	}

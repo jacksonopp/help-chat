@@ -11,6 +11,9 @@
 # Test binary, built with `go test -c`
 *.test
 
+# Debug binaries (created by debugging tools like Delve)
+__debug_bin*
+
 # Code coverage profiles and other test artifacts
 *.out
 coverage.*
